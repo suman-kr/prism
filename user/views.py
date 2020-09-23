@@ -9,6 +9,7 @@ from rest_framework import status
 from django.http import Http404
 from django.contrib.auth import authenticate
 
+
 class UserList(APIView):
     def get(self, request):
         user = User.objects.all()
@@ -31,9 +32,11 @@ class UserDetail(APIView):
     def post(self, request):
         user_serializer = CreateUserSerializer(data=request.data)
         if user_serializer.is_valid():
-            user_serializer.save()
-            return Response(user_serializer.data, status=status.HTTP_201_CREATED)
+            user = user_serializer.save()
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"user": user_serializer.data, "token": token.key}, status=status.HTTP_201_CREATED)
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class Login(generics.GenericAPIView):
     serializer_class = LoginUserSerializer
@@ -42,11 +45,8 @@ class Login(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
-        # token, created = Token.objects.get_or_create(user=user)
+        token, created = Token.objects.get_or_create(user=user)
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-        })
-
-
-
-
+            "user": UserSerializer(user).data,
+            "token": token.key
+        }, status=status.HTTP_200_OK)

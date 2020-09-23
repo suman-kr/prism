@@ -40,6 +40,7 @@ export class Signup extends React.Component<RouteComponentProps, State> {
       }).then((e) => {
         alert("Success!");
         this.setState({ user: { ...initialState } });
+        window.location.href="login"
       });
     } else {
       alert("Required fields are empty");
