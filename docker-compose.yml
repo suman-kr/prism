@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    build: .
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/src
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  client:
+    tty: true
+    stdin_open: true
+    build: ./views
+    volumes:
+      - ./views:/app
+    ports:
+      - "3000:3000"
+    command: yarn start
+    depends_on: 
+      - web
