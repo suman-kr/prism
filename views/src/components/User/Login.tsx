@@ -1,5 +1,5 @@
 import React from "react";
-import { RouteComponentProps } from "@reach/router";
+import { RouteComponentProps, Link } from "@reach/router";
 import { API_URL } from "../../configs";
 export class Login extends React.Component<RouteComponentProps, State> {
   constructor(props) {
@@ -20,7 +20,14 @@ export class Login extends React.Component<RouteComponentProps, State> {
         headers: { "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify(this.state),
-      }).then((e) => console.log(e.json()));
+      })
+        .then((e) => e.json())
+        .then((e) => {
+          console.log(e);
+          localStorage.setItem("role", e.user.roles);
+          window.location.href = "/";
+        })
+        .catch((e) => alert("Something went Wrong!"));
     } else {
       alert("Required fields are empty");
     }
@@ -37,45 +44,51 @@ export class Login extends React.Component<RouteComponentProps, State> {
   render() {
     const { password, username } = this.state;
     return (
-      <div
-        style={{
-          border: "1px solid black",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "10px",
-          margin: "10px",
-        }}
-      >
-        <div className="input">
-          <label htmlFor="username">Email/Phone Number</label>
-          *
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={username}
-            onChange={(e) => this.onChange(e.target.name, e.target.value)}
-          />
+      <>
+        <Link to="/signup" style={{ padding: "10px" }}>
+          Signup
+        </Link>
+        <div
+          style={{
+            border: "1px solid black",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "10px",
+            margin: "10px",
+          }}
+        >
+          <h3>LOGIN</h3>
+          <div className="input">
+            <label htmlFor="username">Email/Phone Number</label>
+            *
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={username}
+              onChange={(e) => this.onChange(e.target.name, e.target.value)}
+            />
+          </div>
+          <div className="input">
+            <label htmlFor="pass">Password</label>
+            *
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={(e) => this.onChange(e.target.name, e.target.value)}
+            />
+          </div>
+          <div className="input">
+            <button type="submit" onClick={this.onSubmit}>
+              Login
+            </button>
+          </div>
         </div>
-        <div className="input">
-          <label htmlFor="pass">Password</label>
-          *
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => this.onChange(e.target.name, e.target.value)}
-          />
-        </div>
-        <div className="input">
-          <button type="submit" onClick={this.onSubmit}>
-            Login
-          </button>
-        </div>
-      </div>
+      </>
     );
   }
 }

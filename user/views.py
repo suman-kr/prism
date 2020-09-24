@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from user.models import User
-from user.serializers import UserSerializer, CreateUserSerializer, LoginUserSerializer
+from user.serializers import UserSerializer, CreateUserSerializer, LoginUserSerializer, VerifyEmailSerializer
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -50,3 +50,18 @@ class Login(generics.GenericAPIView):
             "user": UserSerializer(user).data,
             "token": token.key
         }, status=status.HTTP_200_OK)
+
+
+class VerifyEmail(generics.GenericAPIView):
+    serializer_class = VerifyEmailSerializer
+
+    def post(self, request, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        user.is_verified = True
+        user.save()
+        return Response({
+            "user": UserSerializer(user).data,
+            "success": "Email verified"
+        }, status=status.HTTP_202_ACCEPTED)
