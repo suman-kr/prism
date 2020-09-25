@@ -7,10 +7,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
-from django.contrib.auth import authenticate
-
+from rest_framework.permissions import IsAuthenticated 
 
 class UserList(APIView):
+    permission_classes = (IsAuthenticated,)
     def get(self, request):
         user = User.objects.all()
         serializer = UserSerializer(user, many=True)
@@ -53,6 +53,7 @@ class Login(generics.GenericAPIView):
 
 
 class VerifyEmail(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = VerifyEmailSerializer
 
     def post(self, request, **kwargs):
